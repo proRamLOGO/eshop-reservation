@@ -27,7 +27,7 @@ import javax.persistence.Table;
 @Table(name = "cart_items")
 @NoArgsConstructor
 @AllArgsConstructor
-public class CartItem {
+public class CartItems {
 
     @Id
     @Column(name = "cart_item_id")
