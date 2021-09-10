@@ -7,9 +7,11 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class RequestCartDTO {
+public class RequestCartDTO extends CartResponseDTO {
 
-    public List<CartItemDTO> cartItems;
-    public float amount;
+    private List<CartItemDTO> cartItems;
+    private float cost;
+    private String createdOn;
+    private String updatedOn;
 
 }

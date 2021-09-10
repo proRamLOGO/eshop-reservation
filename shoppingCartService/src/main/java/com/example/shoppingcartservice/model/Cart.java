@@ -33,17 +33,20 @@ import java.sql.Timestamp;
 public class Cart {
 
     @Id
+    @Column(name = "cart_id")
     String cartID;
 
-    float amount;
+    float cost;
 
     @Enumerated(EnumType.STRING)
     Status status;
 
     @CreationTimestamp
+    @Column(name = "created_on")
     String createdOn;
 
     @UpdateTimestamp
+    @Column(name = "updated_on")
     String updatedOn;
 
 }

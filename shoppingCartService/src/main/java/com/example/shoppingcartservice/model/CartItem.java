@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -23,16 +24,29 @@ import javax.persistence.Table;
 @Entity
 @Data
 @Builder
-@Table(name = "cart_reservations")
+@Table(name = "cart_items")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Reservation {
+public class CartItem {
 
     @Id
-    String reservationID;
+    @Column(name = "cart_item_id")
+    private String cartItemID;
 
-    String cartID;
+    @Column(name = "cart_id")
+    private String cartID;
 
-    String itemID;
+    @Column(name = "reservation_id")
+    private String reservationID;
+
+    @Column(name = "item_id")
+    private String itemID;
+
+    private int quantity;
+
+    @Column(name = "cost_per_item")
+    private float costPerItem;
+
+    private Status status;
 
 }
