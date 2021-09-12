@@ -11,10 +11,12 @@ import com.example.reservationservice.repository.ReservationsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-public class ReservationServiceImpl implements ReservationService{
+@Service
+public class ReservationServiceImpl implements ReservationService {
 
     @Autowired
     ReservationsRepository reservationsRepository;
@@ -27,7 +29,11 @@ public class ReservationServiceImpl implements ReservationService{
         Item item = itemsRepository.findByItemID(itemID);
         CreateReservationDTO createReservationDTO = new CreateReservationDTO();
 
-        if ( quantity > item.getQuantityAvailable() ) {
+        if ( item == null ) {
+            // item with itemID NOT FOUND
+            createReservationDTO.setResponse(new ResponseEntity<>("ITEM NOT FOUND", HttpStatus.NOT_FOUND));
+
+        } else if ( quantity > item.getQuantityAvailable() ) {
             // Shortage of Supply, 406, 413, 409, 416, 417
             createReservationDTO.setResponse(new ResponseEntity<>("SHORTAGE", HttpStatus.EXPECTATION_FAILED));
 
@@ -63,10 +69,21 @@ public class ReservationServiceImpl implements ReservationService{
 
         ReservationResponseDTO reservationResponseDTO = new ReservationResponseDTO();
         Reservation reservation = reservationsRepository.findByReservationID(reservationID);
+
+        if ( reservation == null ) {
+            // Reservation with ReservationID not found.
+            reservationResponseDTO.setResponse(new ResponseEntity<>("Reservation NOT FOUND", HttpStatus.NOT_FOUND));
+            return reservationResponseDTO;
+
+        } else if ( reservation.getStatus() == Status.INACTIVE ) {
+            // Reservation with ReservationID DELETED.
+            reservationResponseDTO.setResponse(new ResponseEntity<>("Reservation DELETED", HttpStatus.GONE));
+            return reservationResponseDTO;
+
+        }
+
         String itemID = reservation.getItemID();
-
         Item item = itemsRepository.findByItemID(itemID);
-
 
         int currentReservedQuantity = reservation.getQuantity();
         int quantityChange = newQuantity - currentReservedQuantity;
@@ -98,10 +115,29 @@ public class ReservationServiceImpl implements ReservationService{
 
     public ReservationResponseDTO deleteReservation(String reservationID) {
 
-        Reservation reservation = reservationsRepository.findByReservationID(reservationID);
         ReservationResponseDTO reservationResponseDTO = new ReservationResponseDTO();
+        Reservation reservation = reservationsRepository.findByReservationID(reservationID);
+
+        if ( reservation == null ) {
+            // Reservation with ReservationID not found.
+            reservationResponseDTO.setResponse(new ResponseEntity<>("Reservation NOT FOUND", HttpStatus.NOT_FOUND));
+            return reservationResponseDTO;
+
+        } else if ( reservation.getStatus() == Status.INACTIVE ) {
+            // Reservation with ReservationID DELETED.
+            reservationResponseDTO.setResponse(new ResponseEntity<>("Reservation DELETED ALREADY", HttpStatus.GONE));
+            return reservationResponseDTO;
+
+        }
+
+        Item item = itemsRepository.findByItemID(reservation.getItemID());
 
         reservation.setStatus(Status.INACTIVE);
+        item.setQuantityAvailable(item.getQuantityAvailable() + reservation.getQuantity());
+
+        reservationsRepository.save(reservation);
+        itemsRepository.save(item);
+
         reservationResponseDTO.setResponse(new ResponseEntity<>("DELETED", HttpStatus.OK));
 
         return reservationResponseDTO;
@@ -109,15 +145,29 @@ public class ReservationServiceImpl implements ReservationService{
 
     public ReservationDTO getReservation(String reservationID) {
 
+        System.out.println("here");
         Reservation reservation = reservationsRepository.findByReservationID(reservationID);
+        ReservationDTO reservationDTO = new ReservationDTO();
 
-        ReservationDTO reservationDTO = ReservationDTO.builder()
+        if ( reservation == null ) {
+            // Reservation with ReservationID not found.
+            reservationDTO.setResponse(new ResponseEntity<>("Reservation NOT FOUND", HttpStatus.NOT_FOUND));
+
+        } else if ( reservation.getStatus() == Status.INACTIVE ) {
+            // Reservation with ReservationID DELETED.
+            reservationDTO.setResponse(new ResponseEntity<>("Reservation DELETED", HttpStatus.GONE));
+            return reservationDTO;
+
+        }
+
+        reservationDTO = ReservationDTO.builder()
                 .reservationID(reservation.getReservationID())
                 .itemID(reservation.getItemID())
                 .quantity(reservation.getQuantity())
                 .cost(reservation.getCost())
-                .status(reservation.getStatus())
                 .build();
+
+        reservationDTO.setResponse(new ResponseEntity<>("RESERVATION FOUND", HttpStatus.OK ));
 
         return reservationDTO;
 

@@ -206,6 +206,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
             requestCartDTO.setCartItems(cartItemDTOList);
             requestCartDTO.setCost(cart.getCost());
+            requestCartDTO.setResponse(new ResponseEntity<>("CART FOUND", HttpStatus.OK));
 
         }
 

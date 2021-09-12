@@ -8,6 +8,7 @@ import com.example.shoppingcartservice.service.ShoppingCartService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,27 +27,28 @@ public class ShoppingCartController {
         return createCartDTO;
 
     }
-//
-//    @PostMapping("/item")
-//    public CartResponseDTO addItem(@RequestParam String cartId, @RequestParam String itemId, @RequestParam int quantity ) {
-//
-//        CartResponseDTO cartResponseDTO = shoppingCartService.addCartItem(cartId,itemId,quantity);
-//        LOGGER.info("Item Added");
-//        return cartResponseDTO;
-//
-//    }
-//
-//    @PutMapping("/item")
-//    public CartResponseDTO updateItem(@RequestParam String cartId, @RequestParam String itemId, @RequestParam int quantity ) {
-//
-//        CartResponseDTO cartResponseDTO = shoppingCartService.updateCartItem(cartId,itemId,quantity);
-//        LOGGER.info("Item Updated");
-//        return cartResponseDTO;
-//
-//    }
+
+    @PostMapping("/item")
+    public CartResponseDTO addCartItem(@RequestParam String cartId, @RequestParam String itemId, @RequestParam int quantity ) {
+
+        CartResponseDTO cartResponseDTO = shoppingCartService.addCartItem(cartId,itemId,quantity);
+        if (cartResponseDTO.getResponse().getStatusCode() == HttpStatus.OK)
+        LOGGER.info("Item Added");
+        return cartResponseDTO;
+
+    }
+
+    @PutMapping("/item")
+    public CartResponseDTO updateCartItem(@RequestParam String cartId, @RequestParam String itemId, @RequestParam int quantity ) {
+
+        CartResponseDTO cartResponseDTO = shoppingCartService.updateCartItem(cartId,itemId,quantity);
+        LOGGER.info("Item Updated");
+        return cartResponseDTO;
+
+    }
 //
 //    @DeleteMapping("/item")
-//    public CartResponseDTO deleteItem(@RequestParam String cartId, @RequestParam String itemId) {
+//    public CartResponseDTO deleteCartItem(@RequestParam String cartId, @RequestParam String itemId) {
 //
 //        CartResponseDTO cartResponseDTO = shoppingCartService.deleteCartItem(cartId,itemId);
 //        LOGGER.info("Item Deleted");
