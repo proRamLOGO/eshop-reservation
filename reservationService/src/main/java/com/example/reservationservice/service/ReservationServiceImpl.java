@@ -44,6 +44,11 @@ public class ReservationServiceImpl implements ReservationService{
                     .status(Status.ACTIVE)
                     .build();
 
+            item.setQuantityAvailable(newQuantityAvailable);
+
+            reservationsRepository.save(reservation);
+            itemsRepository.save(item);
+
             createReservationDTO.setReservationID(reservation.getReservationID());
             createReservationDTO.setCostPerItem(item.getCost());
             createReservationDTO.setResponse(new ResponseEntity<>("CREATED", HttpStatus.CREATED));
@@ -54,10 +59,68 @@ public class ReservationServiceImpl implements ReservationService{
 
     }
 
-    public ReservationResponseDTO updateReservation(String reservationID, int quantity);
+    public ReservationResponseDTO updateReservation(String reservationID, int newQuantity) {
 
-    public ReservationResponseDTO deleteReservation(String reservationID);
+        ReservationResponseDTO reservationResponseDTO = new ReservationResponseDTO();
+        Reservation reservation = reservationsRepository.findByReservationID(reservationID);
+        String itemID = reservation.getItemID();
 
-    public ReservationDTO getReservation(String reservationID);
+        Item item = itemsRepository.findByItemID(itemID);
+
+
+        int currentReservedQuantity = reservation.getQuantity();
+        int quantityChange = newQuantity - currentReservedQuantity;
+
+        if ( quantityChange > item.getQuantityAvailable() ) {
+            // Shortage of Supply, 406, 413, 409, 416, 417
+            reservationResponseDTO.setResponse(new ResponseEntity<>("SHORTAGE", HttpStatus.EXPECTATION_FAILED));
+
+        } else {
+
+            float reservationCost = newQuantity * item.getCost();
+            int newQuantityAvailable = item.getQuantityAvailable() - quantityChange;
+
+            reservation.setCost(reservationCost);
+            reservation.setQuantity(newQuantity);
+
+            item.setQuantityAvailable(newQuantityAvailable);
+
+            reservationsRepository.save(reservation);
+            itemsRepository.save(item);
+
+            reservationResponseDTO.setResponse(new ResponseEntity<>("UPDATED SUCCESSFULLY", HttpStatus.OK));
+
+        }
+
+        return reservationResponseDTO;
+
+    }
+
+    public ReservationResponseDTO deleteReservation(String reservationID) {
+
+        Reservation reservation = reservationsRepository.findByReservationID(reservationID);
+        ReservationResponseDTO reservationResponseDTO = new ReservationResponseDTO();
+
+        reservation.setStatus(Status.INACTIVE);
+        reservationResponseDTO.setResponse(new ResponseEntity<>("DELETED", HttpStatus.OK));
+
+        return reservationResponseDTO;
+    }
+
+    public ReservationDTO getReservation(String reservationID) {
+
+        Reservation reservation = reservationsRepository.findByReservationID(reservationID);
+
+        ReservationDTO reservationDTO = ReservationDTO.builder()
+                .reservationID(reservation.getReservationID())
+                .itemID(reservation.getItemID())
+                .quantity(reservation.getQuantity())
+                .cost(reservation.getCost())
+                .status(reservation.getStatus())
+                .build();
+
+        return reservationDTO;
+
+    }
 
 }

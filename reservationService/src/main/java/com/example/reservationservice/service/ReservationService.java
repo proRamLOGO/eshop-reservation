@@ -8,7 +8,7 @@ public interface ReservationService {
 
     public CreateReservationDTO createReservation(String itemID, int quantity);
 
-    public ReservationResponseDTO updateReservation(String reservationID, int quantity);
+    public ReservationResponseDTO updateReservation(String reservationID, int newQuantity);
 
     public ReservationResponseDTO deleteReservation(String reservationID);
 

@@ -91,24 +91,24 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     }
 
-    public CartResponseDTO updateCartItem(String cartID, String itemID, int quantity) {
+    public CartResponseDTO updateCartItem(String cartID, String itemID, int newQuantity) {
 
         // check for if quantity = 0 then call deleteItem
         //---------------------------------------
 
         Cart cart = cartsRepository.findByCartId(cartID);
         CartItem cartItem = cartItemsRepository.findByCartIDAndItemID(cartID, itemID);
-        ReservationResponseDTO reservationResponseDTO = reservationServiceClient.updateReservation(cartItem.getReservationID(),quantity);
+        ReservationResponseDTO reservationResponseDTO = reservationServiceClient.updateReservation(cartItem.getReservationID(),newQuantity);
         CartResponseDTO cartResponseDTO = new CartResponseDTO();
 
         if (reservationResponseDTO.getResponse().getStatusCode() == HttpStatus.OK) {
 
             float originalCost = cartItem.getCostPerItem() * cartItem.getQuantity();
-            float newCost = cartItem.getCostPerItem() * quantity;
+            float newCost = cartItem.getCostPerItem() * newQuantity;
             float cartCostChange = newCost - originalCost;
             float newCartCost = cart.getCost() + cartCostChange;
 
-            cartItem.setQuantity(quantity);
+            cartItem.setQuantity(newQuantity);
             cart.setCost(newCartCost);
 
             cartResponseDTO.setResponse(new ResponseEntity<>("ITEM ADDED", HttpStatus.OK));
@@ -163,11 +163,16 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     public CartResponseDTO deleteCart(String cartID) {
+
         Cart cart = cartsRepository.findByCartId(cartID);
-        cart.setStatus(Status.INACTIVE);
         CartResponseDTO cartResponseDTO = new CartResponseDTO();
+
+        cart.setStatus(Status.INACTIVE);
+
         cartResponseDTO.setResponse(new ResponseEntity<>(HttpStatus.OK));
+
         return cartResponseDTO;
+
     }
 
     public RequestCartDTO getCart(String cartID) {
@@ -185,14 +190,17 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
             for ( CartItem cartItem : cartItemList ) {
 
-                float cartItemCost = cartItem.getQuantity()*cartItem.getCostPerItem();
+                if ( cartItem.getStatus() == Status.ACTIVE ) {
 
-                CartItemDTO cartItemDTO = CartItemDTO.builder()
-                        .itemID(cartItem.getItemID())
-                        .quantity(cartItem.getQuantity())
-                        .cost(cartItemCost)
-                        .build();
-                cartItemDTOList.add(cartItemDTO);
+                    float cartItemCost = cartItem.getQuantity() * cartItem.getCostPerItem();
+
+                    CartItemDTO cartItemDTO = CartItemDTO.builder()
+                            .itemID(cartItem.getItemID())
+                            .quantity(cartItem.getQuantity())
+                            .cost(cartItemCost)
+                            .build();
+                    cartItemDTOList.add(cartItemDTO);
+                }
 
             }
 

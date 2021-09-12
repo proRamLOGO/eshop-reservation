@@ -94,24 +94,24 @@ public class ShoppingCartServiceImpl_BKP implements ShoppingCartService {
 //
 //    }
 //
-//    CartResponseDTO updateCartItem(String cartID, String itemID, int quantity) {
+//    CartResponseDTO updateCartItem(String cartID, String itemID, int newQuantity) {
 //
 //        // check for if quantity = 0 then call deleteItem
 //        //---------------------------------------
 //
 //        Cart cart = cartRepository.findByCartId(cartID);
 //        CartItem cartItem = cartItemsRepository.findByCartIDAndItemID(cartID, itemID);
-//        ReservationResponseDTO reservationResponseDTO = reservationServiceClient.updateReservation(cartItem.getReservationID(),quantity);
+//        ReservationResponseDTO reservationResponseDTO = reservationServiceClient.updateReservation(cartItem.getReservationID(),newQuantity);
 //        CartResponseDTO cartResponseDTO = new CartResponseDTO();
 //
 //        if (reservationResponseDTO.getResponse().getStatusCode() == HttpStatus.OK) {
 //
 //            float originalCost = cartItem.getCostPerItem() * cartItem.getQuantity();
-//            float newCost = cartItem.getCostPerItem() * quantity;
+//            float newCost = cartItem.getCostPerItem() * newQuantity;
 //            float cartCostChange = newCost - originalCost;
 //            float newCartCost = cart.getCost() + cartCostChange;
 //
-//            cartItem.setQuantity(quantity);
+//            cartItem.setQuantity(newQuantity);
 //            cart.setCost(newCartCost);
 //            cart.setUpdatedOn(new Timestamp(System.currentTimeMillis()).toString());
 //
