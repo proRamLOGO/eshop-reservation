@@ -6,16 +6,16 @@ import com.example.shoppingcartservice.dto.CartResponseDTO;
 
 public interface ShoppingCartService {
 
-    CreateCartDTO createCart();
+    public CreateCartDTO createCart();
 
-    CartResponseDTO addCartItem(String cartID, String itemID, int quantity);
+//    public CartResponseDTO addCartItem(String cartID, String itemID, int quantity);
+//
+//    public CartResponseDTO updateCartItem(String cartID, String itemID, int quantity);
+//
+//    public CartResponseDTO deleteCartItem(String cartID, String itemID);
 
-    CartResponseDTO updateCartItem(String cartID, String itemID, int quantity);
+    public CartResponseDTO deleteCart(String cartID);
 
-    CartResponseDTO deleteCartItem(String cartID, String itemID);
-
-    CartResponseDTO deleteCart(String cartID);
-
-    RequestCartDTO getCart(String cartID);
+    public RequestCartDTO getCart(String cartID);
 
 }

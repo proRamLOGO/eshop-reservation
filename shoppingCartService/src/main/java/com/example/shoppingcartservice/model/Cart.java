@@ -9,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 
 /*
 * Cart Class
@@ -43,10 +44,10 @@ public class Cart {
 
     @CreationTimestamp
     @Column(name = "created_on")
-    String createdOn;
+    Date createdOn;
 
     @UpdateTimestamp
     @Column(name = "updated_on")
-    String updatedOn;
+    Date updatedOn;
 
 }

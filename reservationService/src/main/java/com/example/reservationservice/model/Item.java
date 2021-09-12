@@ -5,7 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.Date;
 
 @Data
 @Document(collection = "items")
@@ -17,8 +20,11 @@ public class Item {
     @Id
     private String itemID;
 
+    private int quantityAvailable;
+
     private float cost;
 
-    private int quantityAvailable;
+    @LastModifiedDate
+    private Date updatedOn;
 
 }

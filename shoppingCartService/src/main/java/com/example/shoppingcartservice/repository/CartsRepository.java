@@ -6,7 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CartRepository extends CrudRepository<Cart, String> {
+public interface CartsRepository extends CrudRepository<Cart, String> {
 
     Cart findByCartId(String cartID);
 

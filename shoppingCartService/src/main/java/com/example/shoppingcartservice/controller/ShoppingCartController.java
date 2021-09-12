@@ -22,37 +22,37 @@ public class ShoppingCartController {
     public CreateCartDTO createCart() {
 
         CreateCartDTO createCartDTO = shoppingCartService.createCart();
-        LOGGER.info("Cart Created");
+        LOGGER.info("New Cart "+createCartDTO.getCartID()+" Created");
         return createCartDTO;
 
     }
-
-    @PostMapping("/item")
-    public CartResponseDTO addItem(@RequestParam String cartId, @RequestParam String itemId, @RequestParam int quantity ) {
-
-        CartResponseDTO cartResponseDTO = shoppingCartService.addCartItem(cartId,itemId,quantity);
-        LOGGER.info("Item Added");
-        return cartResponseDTO;
-
-    }
-
-    @PutMapping("/item")
-    public CartResponseDTO updateItem(@RequestParam String cartId, @RequestParam String itemId, @RequestParam int quantity ) {
-
-        CartResponseDTO cartResponseDTO = shoppingCartService.updateCartItem(cartId,itemId,quantity);
-        LOGGER.info("Item Updated");
-        return cartResponseDTO;
-
-    }
-
-    @DeleteMapping("/item")
-    public CartResponseDTO deleteItem(@RequestParam String cartId, @RequestParam String itemId) {
-
-        CartResponseDTO cartResponseDTO = shoppingCartService.deleteCartItem(cartId,itemId);
-        LOGGER.info("Item Deleted");
-        return cartResponseDTO;
-
-    }
+//
+//    @PostMapping("/item")
+//    public CartResponseDTO addItem(@RequestParam String cartId, @RequestParam String itemId, @RequestParam int quantity ) {
+//
+//        CartResponseDTO cartResponseDTO = shoppingCartService.addCartItem(cartId,itemId,quantity);
+//        LOGGER.info("Item Added");
+//        return cartResponseDTO;
+//
+//    }
+//
+//    @PutMapping("/item")
+//    public CartResponseDTO updateItem(@RequestParam String cartId, @RequestParam String itemId, @RequestParam int quantity ) {
+//
+//        CartResponseDTO cartResponseDTO = shoppingCartService.updateCartItem(cartId,itemId,quantity);
+//        LOGGER.info("Item Updated");
+//        return cartResponseDTO;
+//
+//    }
+//
+//    @DeleteMapping("/item")
+//    public CartResponseDTO deleteItem(@RequestParam String cartId, @RequestParam String itemId) {
+//
+//        CartResponseDTO cartResponseDTO = shoppingCartService.deleteCartItem(cartId,itemId);
+//        LOGGER.info("Item Deleted");
+//        return cartResponseDTO;
+//
+//    }
 
     @DeleteMapping("/cart/{cartID}")
     public CartResponseDTO deleteCart(@PathVariable String cartId) {

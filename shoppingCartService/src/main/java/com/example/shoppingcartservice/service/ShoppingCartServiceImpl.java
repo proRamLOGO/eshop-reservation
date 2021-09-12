@@ -7,17 +7,16 @@ import com.example.shoppingcartservice.dto.CartResponseDTO;
 import com.example.shoppingcartservice.model.Cart;
 import com.example.shoppingcartservice.model.CartItem;
 import com.example.shoppingcartservice.model.Status;
-import com.example.shoppingcartservice.repository.CartRepository;
+import com.example.shoppingcartservice.repository.CartsRepository;
 import com.example.shoppingcartservice.repository.CartItemsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.example.reservationservice.dto.CreateReservationDTO;
+//import com.example.reservationservice.dto.CreateReservationDTO;
 
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -26,23 +25,19 @@ import java.util.UUID;
 public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Autowired
-    CartRepository cartRepository;
+    CartsRepository cartsRepository;
     @Autowired
     CartItemsRepository cartItemsRepository;
 
     public CreateCartDTO createCart() {
 
-        String currentTime = new Timestamp(System.currentTimeMillis()).toString();
-
         // New Cart created and saved
         Cart cart = Cart.builder()
                             .cartID(UUID.randomUUID().toString())
-                            .amount(0)
+                            .cost(0)
                             .status(Status.ACTIVE)
-                            .createdOn(currentTime)
-                            .updatedOn(currentTime)
                             .build();
-        cartRepository.save(cart);
+        cartsRepository.save(cart);
 
         // Service Response
         CreateCartDTO createCartDTO = new CreateCartDTO();
@@ -53,9 +48,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     }
 
-    CartResponseDTO addCartItem(String cartID, String itemID, int quantity) {
+    public CartResponseDTO addCartItem(String cartID, String itemID, int quantity) {
 
-        Cart cart = cartRepository.findByCartId(cartID);
+        Cart cart = cartsRepository.findByCartId(cartID);
         CreateReservationDTO reservationDTO = reservationServiceClient.createReservation(itemID, quantity);
         CartResponseDTO cartResponseDTO = new CartResponseDTO();
 
@@ -67,14 +62,13 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                     .itemID(itemID)
                     .reservationID(reservationDTO.getReservationID())
                     .quantity(quantity)
-                    .amount(reservationDTO.amount)
+                    .costPerItem(reservationDTO.getCostPerItem())
                     .build();
 
             float newCost = cartItem.getCostPerItem() * quantity;
             cart.setCost(cart.getCost()+newCost);
-            cart.setUpdatedOn(new Timestamp(System.currentTimeMillis()).toString());
 
-            cartRepository.save(cart);
+            cartsRepository.save(cart);
             cartItemsRepository.save(cartItem);
 
             cartResponseDTO.setResponse(new ResponseEntity<>("ITEM ADDED", HttpStatus.OK));
@@ -97,12 +91,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     }
 
-    CartResponseDTO updateCartItem(String cartID, String itemID, int quantity) {
+    public CartResponseDTO updateCartItem(String cartID, String itemID, int quantity) {
 
         // check for if quantity = 0 then call deleteItem
         //---------------------------------------
 
-        Cart cart = cartRepository.findByCartId(cartID);
+        Cart cart = cartsRepository.findByCartId(cartID);
         CartItem cartItem = cartItemsRepository.findByCartIDAndItemID(cartID, itemID);
         ReservationResponseDTO reservationResponseDTO = reservationServiceClient.updateReservation(cartItem.getReservationID(),quantity);
         CartResponseDTO cartResponseDTO = new CartResponseDTO();
@@ -116,7 +110,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
             cartItem.setQuantity(quantity);
             cart.setCost(newCartCost);
-            cart.setUpdatedOn(new Timestamp(System.currentTimeMillis()).toString());
 
             cartResponseDTO.setResponse(new ResponseEntity<>("ITEM ADDED", HttpStatus.OK));
 
@@ -138,9 +131,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     }
 
-    CartResponseDTO deleteCartItem(String cartID, String itemID) {
+    public CartResponseDTO deleteCartItem(String cartID, String itemID) {
 
-        Cart cart = cartRepository.findByCartId(cartID);
+        Cart cart = cartsRepository.findByCartId(cartID);
         CartItem cartItem = cartItemsRepository.findByCartIDAndItemID(cartID, itemID);
         ReservationResponseDTO reservationResponseDTO = reservationServiceClient.deleteReservation(cartItem.getReservationID());
         CartResponseDTO cartResponseDTO = new CartResponseDTO();
@@ -151,7 +144,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
             cartItem.setStatus(Status.INACTIVE);
             cart.setCost(newCartCost);
-            cart.setUpdatedOn(new Timestamp(System.currentTimeMillis()).toString());
 
             cartResponseDTO.setResponse(new ResponseEntity<>("ITEM DELETED", HttpStatus.OK));
 
@@ -170,18 +162,18 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     }
 
-    CartResponseDTO deleteCart(String cartID) {
-        Cart cart = cartRepository.findByCartId(cartID);
+    public CartResponseDTO deleteCart(String cartID) {
+        Cart cart = cartsRepository.findByCartId(cartID);
         cart.setStatus(Status.INACTIVE);
         CartResponseDTO cartResponseDTO = new CartResponseDTO();
         cartResponseDTO.setResponse(new ResponseEntity<>(HttpStatus.OK));
         return cartResponseDTO;
     }
 
-    RequestCartDTO getCart(String cartID) {
+    public RequestCartDTO getCart(String cartID) {
 
         RequestCartDTO requestCartDTO = new RequestCartDTO();
-        Cart cart = cartRepository.findByCartId(cartID);
+        Cart cart = cartsRepository.findByCartId(cartID);
 
         if ( cart.getStatus() == Status.INACTIVE ) {
             requestCartDTO.setResponse(new ResponseEntity<>("CART INACTIVE", HttpStatus.CONFLICT));
@@ -206,8 +198,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
             requestCartDTO.setCartItems(cartItemDTOList);
             requestCartDTO.setCost(cart.getCost());
-            requestCartDTO.setCreatedOn(cart.getCreatedOn());
-            requestCartDTO.setUpdatedOn(cart.getUpdatedOn());
 
         }
 
