@@ -1,21 +1,17 @@
 package com.example.shoppingcartservice.service;
 
-import com.example.shoppingcartservice.dto.CartItemDTO;
-import com.example.shoppingcartservice.dto.CreateCartDTO;
-import com.example.shoppingcartservice.dto.RequestCartDTO;
-import com.example.shoppingcartservice.dto.CartResponseDTO;
+import com.example.shoppingcartservice.client.ReservationServiceClient;
+import com.example.shoppingcartservice.dto.*;
 import com.example.shoppingcartservice.model.Cart;
 import com.example.shoppingcartservice.model.CartItem;
 import com.example.shoppingcartservice.model.Status;
-import com.example.shoppingcartservice.repository.CartsRepository;
-import com.example.shoppingcartservice.repository.CartItemsRepository;
+import com.example.shoppingcartservice.repository.CartRepository;
+import com.example.shoppingcartservice.repository.CartItemRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-//import com.example.reservationservice.dto.CreateReservationDTO;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +21,11 @@ import java.util.UUID;
 public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Autowired
-    CartsRepository cartsRepository;
+    CartRepository cartRepository;
     @Autowired
-    CartItemsRepository cartItemsRepository;
+    CartItemRepository cartItemRepository;
+    @Autowired
+    ReservationServiceClient reservationServiceClient;
 
     public CreateCartDTO createCart() {
 
@@ -37,7 +35,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                             .cost(0)
                             .status(Status.ACTIVE)
                             .build();
-        cartsRepository.save(cart);
+        cartRepository.save(cart);
 
         // Service Response
         CreateCartDTO createCartDTO = new CreateCartDTO();
@@ -50,34 +48,34 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     public CartResponseDTO addCartItem(String cartID, String itemID, int quantity) {
 
-        Cart cart = cartsRepository.findByCartId(cartID);
-        CreateReservationDTO reservationDTO = reservationServiceClient.createReservation(itemID, quantity);
+        Cart cart = cartRepository.findByCartId(cartID);
+        CreateReservationDTO createReservationDTO = reservationServiceClient.createReservation(itemID, quantity);
         CartResponseDTO cartResponseDTO = new CartResponseDTO();
 
-        if ( reservationDTO.getResponse().getStatusCode() == HttpStatus.CREATED ) {
+        if ( createReservationDTO.getResponse().getStatusCode() == HttpStatus.CREATED ) {
 
             CartItem cartItem = CartItem.builder()
                     .cartItemID(UUID.randomUUID().toString())
                     .cartID(cartID)
                     .itemID(itemID)
-                    .reservationID(reservationDTO.getReservationID())
+                    .reservationID(createReservationDTO.getReservationID())
                     .quantity(quantity)
-                    .costPerItem(reservationDTO.getCostPerItem())
+                    .costPerItem(createReservationDTO.getCostPerItem())
                     .build();
 
             float newCost = cartItem.getCostPerItem() * quantity;
             cart.setCost(cart.getCost()+newCost);
 
-            cartsRepository.save(cart);
-            cartItemsRepository.save(cartItem);
+            cartRepository.save(cart);
+            cartItemRepository.save(cartItem);
 
             cartResponseDTO.setResponse(new ResponseEntity<>("ITEM ADDED", HttpStatus.OK));
 
-        } else if ( createReservationDTO.getResonse().getRequestStatus() == HttpStatus.NOT_FOUND ) {
+        } else if (createReservationDTO.getResponse().getStatusCode() == HttpStatus.NOT_FOUND ) {
 
             cartResponseDTO.setResponse(new ResponseEntity<>("ITEM NOT FOUND", HttpStatus.NOT_FOUND));
 
-        } else if ( createReservationDTO.getResonse().getRequestStatus() == HttpStatus.EXPECTATION_FAILED ) {
+        } else if ( createReservationDTO.getResponse().getStatusCode() == HttpStatus.EXPECTATION_FAILED ) {
 
             cartResponseDTO.setResponse(new ResponseEntity<>("ITEM QUANTITY NOT AVAILABLE", HttpStatus.EXPECTATION_FAILED));
 
@@ -96,8 +94,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         // check for if quantity = 0 then call deleteItem
         //---------------------------------------
 
-        Cart cart = cartsRepository.findByCartId(cartID);
-        CartItem cartItem = cartItemsRepository.findByCartIDAndItemID(cartID, itemID);
+        Cart cart = cartRepository.findByCartId(cartID);
+        CartItem cartItem = cartItemRepository.findByCartIDAndItemID(cartID, itemID);
         ReservationResponseDTO reservationResponseDTO = reservationServiceClient.updateReservation(cartItem.getReservationID(),newQuantity);
         CartResponseDTO cartResponseDTO = new CartResponseDTO();
 
@@ -113,11 +111,11 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
             cartResponseDTO.setResponse(new ResponseEntity<>("ITEM ADDED", HttpStatus.OK));
 
-        } else if ( reservationResponseDTO.getResponse().getRequestStatus() == HttpStatus.NOT_FOUND ) {
+        } else if ( reservationResponseDTO.getResponse().getStatusCode() == HttpStatus.NOT_FOUND ) {
 
             cartResponseDTO.setResponse(new ResponseEntity<>("ITEM NOT FOUND", HttpStatus.NOT_FOUND));
 
-        } else if ( reservationResponseDTO.getResponse().getRequestStatus() == HttpStatus.EXPECTATION_FAILED ) {
+        } else if ( reservationResponseDTO.getResponse().getStatusCode() == HttpStatus.EXPECTATION_FAILED ) {
 
             cartResponseDTO.setResponse(new ResponseEntity<>("ITEM QUANTITY NOT AVAILABLE", HttpStatus.EXPECTATION_FAILED));
 
@@ -133,8 +131,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     public CartResponseDTO deleteCartItem(String cartID, String itemID) {
 
-        Cart cart = cartsRepository.findByCartId(cartID);
-        CartItem cartItem = cartItemsRepository.findByCartIDAndItemID(cartID, itemID);
+        Cart cart = cartRepository.findByCartId(cartID);
+        CartItem cartItem = cartItemRepository.findByCartIDAndItemID(cartID, itemID);
         ReservationResponseDTO reservationResponseDTO = reservationServiceClient.deleteReservation(cartItem.getReservationID());
         CartResponseDTO cartResponseDTO = new CartResponseDTO();
 
@@ -147,7 +145,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
             cartResponseDTO.setResponse(new ResponseEntity<>("ITEM DELETED", HttpStatus.OK));
 
-        } else if ( reservationResponseDTO.getResponse().getRequestStatus() == HttpStatus.NOT_FOUND ) {
+        } else if ( reservationResponseDTO.getResponse().getStatusCode() == HttpStatus.NOT_FOUND ) {
 
             cartResponseDTO.setResponse(new ResponseEntity<>("ITEM RESERVATION NOT FOUND", HttpStatus.NOT_FOUND));
             // since its present here and not found in reservation, should we update it here ?
@@ -164,7 +162,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     public CartResponseDTO deleteCart(String cartID) {
 
-        Cart cart = cartsRepository.findByCartId(cartID);
+        Cart cart = cartRepository.findByCartId(cartID);
         CartResponseDTO cartResponseDTO = new CartResponseDTO();
 
         cart.setStatus(Status.INACTIVE);
@@ -178,14 +176,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public RequestCartDTO getCart(String cartID) {
 
         RequestCartDTO requestCartDTO = new RequestCartDTO();
-        Cart cart = cartsRepository.findByCartId(cartID);
+        Cart cart = cartRepository.findByCartId(cartID);
 
         if ( cart.getStatus() == Status.INACTIVE ) {
             requestCartDTO.setResponse(new ResponseEntity<>("CART INACTIVE", HttpStatus.CONFLICT));
 
         } else {
 
-            List<CartItem> cartItemList = cartItemsRepository.findByCartID(cartID);
+            List<CartItem> cartItemList = cartItemRepository.findByCartID(cartID);
             List<CartItemDTO> cartItemDTOList = new ArrayList<>();
 
             for ( CartItem cartItem : cartItemList ) {

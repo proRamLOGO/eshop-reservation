@@ -7,9 +7,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@SpringBootApplication()
+@SpringBootApplication
 @EnableFeignClients
-@EnableJpaRepositories("com.example.shoppingcartservice.repository")
+@EnableJpaRepositories
 
 public class ShoppingCartServiceApplication {
 

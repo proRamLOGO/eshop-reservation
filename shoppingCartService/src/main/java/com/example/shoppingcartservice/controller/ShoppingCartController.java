@@ -17,6 +17,7 @@ public class ShoppingCartController {
 
     @Autowired
     ShoppingCartService shoppingCartService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ShoppingCartController.class);
 
     @PostMapping("/cart")
@@ -46,17 +47,17 @@ public class ShoppingCartController {
         return cartResponseDTO;
 
     }
-//
-//    @DeleteMapping("/item")
-//    public CartResponseDTO deleteCartItem(@RequestParam String cartId, @RequestParam String itemId) {
-//
-//        CartResponseDTO cartResponseDTO = shoppingCartService.deleteCartItem(cartId,itemId);
-//        LOGGER.info("Item Deleted");
-//        return cartResponseDTO;
-//
-//    }
 
-    @DeleteMapping("/cart/{cartID}")
+    @DeleteMapping("/item")
+    public CartResponseDTO deleteCartItem(@RequestParam String cartId, @RequestParam String itemId) {
+
+        CartResponseDTO cartResponseDTO = shoppingCartService.deleteCartItem(cartId,itemId);
+        LOGGER.info("Item Deleted");
+        return cartResponseDTO;
+
+    }
+
+    @DeleteMapping("/cart/{cartId}")
     public CartResponseDTO deleteCart(@PathVariable String cartId) {
 
         CartResponseDTO cartResponseDTO = shoppingCartService.deleteCart(cartId);
@@ -65,9 +66,9 @@ public class ShoppingCartController {
 
     }
 
-    @GetMapping("/cart/{cartID}")
-    public RequestCartDTO getCart(@PathVariable String cartID) {
-        RequestCartDTO requestCartDTO = shoppingCartService.getCart(cartID);
+    @GetMapping("/cart/{cartId}")
+    public RequestCartDTO getCart(@PathVariable String cartId) {
+        RequestCartDTO requestCartDTO = shoppingCartService.getCart(cartId);
         LOGGER.info("Cart Found and Fetched");
         return requestCartDTO;
     }

@@ -1,11 +1,13 @@
 package com.example.reservationservice.repository;
 
 import com.example.reservationservice.model.Item;
+import com.example.reservationservice.model.Reservation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ItemsRepository extends MongoRepository<Item,String> {
+public interface ReservationRepository extends MongoRepository<Reservation, String> {
 
-    Item findByItemID(String itemID);
+    Reservation findByReservationID(String reservationID);
+
 }

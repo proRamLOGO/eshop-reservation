@@ -6,8 +6,8 @@ import com.example.reservationservice.dto.ReservationResponseDTO;
 import com.example.reservationservice.model.Item;
 import com.example.reservationservice.model.Reservation;
 import com.example.reservationservice.model.Status;
-import com.example.reservationservice.repository.ItemsRepository;
-import com.example.reservationservice.repository.ReservationsRepository;
+import com.example.reservationservice.repository.ItemRepository;
+import com.example.reservationservice.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +19,14 @@ import java.util.UUID;
 public class ReservationServiceImpl implements ReservationService {
 
     @Autowired
-    ReservationsRepository reservationsRepository;
+    ReservationRepository reservationRepository;
 
     @Autowired
-    ItemsRepository itemsRepository;
+    ItemRepository itemRepository;
 
     public CreateReservationDTO createReservation(String itemID, int quantity) {
 
-        Item item = itemsRepository.findByItemID(itemID);
+        Item item = itemRepository.findByItemID(itemID);
         CreateReservationDTO createReservationDTO = new CreateReservationDTO();
 
         if ( item == null ) {
@@ -52,8 +52,8 @@ public class ReservationServiceImpl implements ReservationService {
 
             item.setQuantityAvailable(newQuantityAvailable);
 
-            reservationsRepository.save(reservation);
-            itemsRepository.save(item);
+            reservationRepository.save(reservation);
+            itemRepository.save(item);
 
             createReservationDTO.setReservationID(reservation.getReservationID());
             createReservationDTO.setCostPerItem(item.getCost());
@@ -68,7 +68,7 @@ public class ReservationServiceImpl implements ReservationService {
     public ReservationResponseDTO updateReservation(String reservationID, int newQuantity) {
 
         ReservationResponseDTO reservationResponseDTO = new ReservationResponseDTO();
-        Reservation reservation = reservationsRepository.findByReservationID(reservationID);
+        Reservation reservation = reservationRepository.findByReservationID(reservationID);
 
         if ( reservation == null ) {
             // Reservation with ReservationID not found.
@@ -83,7 +83,7 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
         String itemID = reservation.getItemID();
-        Item item = itemsRepository.findByItemID(itemID);
+        Item item = itemRepository.findByItemID(itemID);
 
         int currentReservedQuantity = reservation.getQuantity();
         int quantityChange = newQuantity - currentReservedQuantity;
@@ -102,8 +102,8 @@ public class ReservationServiceImpl implements ReservationService {
 
             item.setQuantityAvailable(newQuantityAvailable);
 
-            reservationsRepository.save(reservation);
-            itemsRepository.save(item);
+            reservationRepository.save(reservation);
+            itemRepository.save(item);
 
             reservationResponseDTO.setResponse(new ResponseEntity<>("UPDATED SUCCESSFULLY", HttpStatus.OK));
 
@@ -116,7 +116,7 @@ public class ReservationServiceImpl implements ReservationService {
     public ReservationResponseDTO deleteReservation(String reservationID) {
 
         ReservationResponseDTO reservationResponseDTO = new ReservationResponseDTO();
-        Reservation reservation = reservationsRepository.findByReservationID(reservationID);
+        Reservation reservation = reservationRepository.findByReservationID(reservationID);
 
         if ( reservation == null ) {
             // Reservation with ReservationID not found.
@@ -130,13 +130,13 @@ public class ReservationServiceImpl implements ReservationService {
 
         }
 
-        Item item = itemsRepository.findByItemID(reservation.getItemID());
+        Item item = itemRepository.findByItemID(reservation.getItemID());
 
         reservation.setStatus(Status.INACTIVE);
         item.setQuantityAvailable(item.getQuantityAvailable() + reservation.getQuantity());
 
-        reservationsRepository.save(reservation);
-        itemsRepository.save(item);
+        reservationRepository.save(reservation);
+        itemRepository.save(item);
 
         reservationResponseDTO.setResponse(new ResponseEntity<>("DELETED", HttpStatus.OK));
 
@@ -146,7 +146,7 @@ public class ReservationServiceImpl implements ReservationService {
     public ReservationDTO getReservation(String reservationID) {
 
         System.out.println("here");
-        Reservation reservation = reservationsRepository.findByReservationID(reservationID);
+        Reservation reservation = reservationRepository.findByReservationID(reservationID);
         ReservationDTO reservationDTO = new ReservationDTO();
 
         if ( reservation == null ) {

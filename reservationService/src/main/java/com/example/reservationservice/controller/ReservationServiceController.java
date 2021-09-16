@@ -24,7 +24,7 @@ public class ReservationServiceController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReservationServiceApplication.class);
 
     @PostMapping("/reservation")
-    public String createReservation(@RequestParam String itemID, @RequestParam int quantity) {
+    public CreateReservationDTO createReservation(@RequestParam String itemID, @RequestParam int quantity) {
 
         CreateReservationDTO reservationDTO = reservationService.createReservation(itemID, quantity);
         LOGGER.info("Item NOT Found");
@@ -36,8 +36,7 @@ public class ReservationServiceController {
             LOGGER.info("Item NOT Found");
         }
 
-        return "cReAtEd";
-//        return reservationDTO;
+      return reservationDTO;
 
     }
 

@@ -2,14 +2,19 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="reservationService" />
         <module name="shoppingCartService" />
+        <module name="eshop-training" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="eshop-training" target="1.5" />
+      <module name="reservationService" target="1.8" />
       <module name="shoppingCartService" target="1.8" />
     </bytecodeTargetLevel>
   </component>
