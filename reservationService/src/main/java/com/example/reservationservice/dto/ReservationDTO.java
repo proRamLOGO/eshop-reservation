@@ -16,7 +16,6 @@ public class ReservationDTO extends ReservationResponseDTO {
 
     @Id
     private String reservationID;
-    // ----------------------- ??? can extend create reservationDTO ??? -----------------------
 
     private String itemID;
 

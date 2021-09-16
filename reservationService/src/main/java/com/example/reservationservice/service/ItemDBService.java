@@ -6,9 +6,9 @@ public interface ItemDBService {
 
     public ResponseEntity<String> addItem(String itemID, int quantity, float cost);
 
-    public ResponseEntity<String> updateItemCost(String itemID, int newCost);
+    public ResponseEntity<String> updateItemCost(String itemID, float cost);
 
-    public ResponseEntity<String> updateItemQuantity(String itemID, int newQuantity);
+    public ResponseEntity<String> updateItemQuantity(String itemID, int quantity);
 
     public ResponseEntity<String> deleteItem(String itemID);
 

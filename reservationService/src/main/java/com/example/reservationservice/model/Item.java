@@ -27,4 +27,6 @@ public class Item {
     @LastModifiedDate
     private Date updatedOn;
 
+    private Status status;
+
 }
