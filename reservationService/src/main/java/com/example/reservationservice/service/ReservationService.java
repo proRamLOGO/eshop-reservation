@@ -6,12 +6,12 @@ import com.example.reservationservice.dto.ReservationResponseDTO;
 
 public interface ReservationService {
 
-    public CreateReservationDTO createReservation(String itemID, int quantity);
+    CreateReservationDTO createReservation(String itemID, int quantity);
 
-    public ReservationResponseDTO updateReservation(String reservationID, int newQuantity);
+    ReservationResponseDTO updateReservation(String reservationID, int newQuantity);
 
-    public ReservationResponseDTO deleteReservation(String reservationID);
+    ReservationResponseDTO deleteReservation(String reservationID);
 
-    public ReservationDTO getReservation(String reservationID);
+    ReservationDTO getReservation(String reservationID);
 
 }

@@ -5,10 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /*
  * Reservation Class
@@ -47,6 +44,7 @@ public class CartItem {
     @Column(name = "cost_per_item")
     private float costPerItem;
 
+    @Enumerated(EnumType.STRING)
     private Status status;
 
 }
