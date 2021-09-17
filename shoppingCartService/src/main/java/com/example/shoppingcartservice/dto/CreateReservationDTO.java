@@ -11,8 +11,7 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 public class CreateReservationDTO extends com.example.shoppingcartservice.dto.ReservationResponseDTO {
 
-    @Id
-    private String reservationID;
+    private String reservationId;
 
     private float costPerItem;
 

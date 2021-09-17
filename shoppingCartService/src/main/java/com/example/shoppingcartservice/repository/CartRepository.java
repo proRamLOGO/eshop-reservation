@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CartRepository extends CrudRepository<Cart, String> {
 
-    Cart findByCartId(String cartID);
+    Cart findByCartId(String cartId);
 
 }

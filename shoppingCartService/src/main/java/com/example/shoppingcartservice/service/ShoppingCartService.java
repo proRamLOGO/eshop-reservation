@@ -8,14 +8,14 @@ public interface ShoppingCartService {
 
     public CreateCartDTO createCart();
 
-    public CartResponseDTO addCartItem(String cartID, String itemID, int quantity);
+    public CartResponseDTO addCartItem(String cartId, String itemId, int quantity);
 
-    public CartResponseDTO updateCartItem(String cartID, String itemID, int quantity);
+    public CartResponseDTO updateCartItem(String cartId, String itemId, int quantity);
 
-    public CartResponseDTO deleteCartItem(String cartID, String itemID);
+    public CartResponseDTO deleteCartItem(String cartId, String itemId);
 
-    public CartResponseDTO deleteCart(String cartID);
+    public CartResponseDTO deleteCart(String cartId);
 
-    public RequestCartDTO getCart(String cartID);
+    public RequestCartDTO getCart(String cartId);
 
 }

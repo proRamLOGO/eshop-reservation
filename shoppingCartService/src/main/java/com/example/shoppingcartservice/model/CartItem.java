@@ -28,16 +28,16 @@ public class CartItem {
 
     @Id
     @Column(name = "cart_item_id")
-    private String cartItemID;
+    private String cartItemId;
 
     @Column(name = "cart_id")
-    private String cartID;
+    private String cartId;
 
     @Column(name = "reservation_id")
-    private String reservationID;
+    private String reservationId;
 
     @Column(name = "item_id")
-    private String itemID;
+    private String itemId;
 
     private int quantity;
 

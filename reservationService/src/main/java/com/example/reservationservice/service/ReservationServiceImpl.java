@@ -157,8 +157,9 @@ public class ReservationServiceImpl implements ReservationService {
         Reservation reservation = reservationRepository.findByReservationID(reservationID);
         ReservationDTO reservationDTO = new ReservationDTO();
 
-        if ( reservation == null ) {
+        if ( reservation == null || reservation.getStatus() == Status.INACTIVE ) {
             LOGGER.info("Reservation not found.");
+            return null;
             reservationDTO.setResponse(new ResponseEntity<>("Reservation NOT FOUND", HttpStatus.NOT_FOUND));
 
         } else if ( reservation.getStatus() == Status.INACTIVE ) {

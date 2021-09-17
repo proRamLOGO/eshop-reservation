@@ -11,7 +11,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class CartItemDTO {
 
-    private String itemID;
+    private String itemId;
     private int quantity;
     private float cost;
 

@@ -13,11 +13,9 @@ import org.springframework.data.annotation.Id;
 @Builder
 public class ReservationDTO extends ReservationResponseDTO {
 
-    @Id
-    private String reservationID;
-    // ----------------------- ??? can extend create reservationDTO ??? -----------------------
+    private String reservationId;
 
-    private String itemID;
+    private String itemId;
 
     private int quantity;
 

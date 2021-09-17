@@ -35,7 +35,7 @@ public class Cart {
 
     @Id
     @Column(name = "cart_id")
-    String cartID;
+    String cartId;
 
     float cost;
 

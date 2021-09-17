@@ -26,7 +26,7 @@ public class ShoppingCartController {
     public CreateCartDTO createCart() {
 
         CreateCartDTO createCartDTO = shoppingCartService.createCart();
-        LOGGER.info("New Cart "+createCartDTO.getCartID()+" Created");
+        LOGGER.info("New Cart "+createCartDTO.getCartId()+" Created");
         return createCartDTO;
 
     }

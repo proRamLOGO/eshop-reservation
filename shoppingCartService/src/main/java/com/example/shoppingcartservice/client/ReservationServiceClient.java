@@ -8,7 +8,7 @@ import com.example.shoppingcartservice.dto.CreateReservationDTO;
 import com.example.shoppingcartservice.dto.ReservationDTO;
 import com.example.shoppingcartservice.dto.ReservationResponseDTO;
 
-@FeignClient(name = "reservation", url  = "http://" + "${host}" + ":${port}" + "/reservation")
+@FeignClient(name = "reservation", url  = "http://localhost:8080/reservation")
 @Component
 public interface ReservationServiceClient {
 

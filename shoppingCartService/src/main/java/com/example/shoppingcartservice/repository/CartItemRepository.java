@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface CartItemRepository extends CrudRepository<CartItem, String> {
 
-    CartItem findByCartIDAndItemID(String cartID, String itemID);
-    List<CartItem> findByCartID(String cartID);
+    CartItem findByCartIdAndItemId(String cartId, String itemId);
+    List<CartItem> findByCartId(String cartId);
 
 }

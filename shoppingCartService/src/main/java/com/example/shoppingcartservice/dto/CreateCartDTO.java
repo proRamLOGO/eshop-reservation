@@ -10,7 +10,6 @@ import javax.persistence.Id;
 @NoArgsConstructor
 public class CreateCartDTO extends CartResponseDTO {
 
-    @Id
-    private String cartID;
+    private String cartId;
 
 }
