@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateReservationDTO extends ReservationResponseDTO {
+public class CreateReservationDTO {
 
     private String reservationID;
 

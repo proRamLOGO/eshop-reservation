@@ -1,5 +1,6 @@
 package com.example.shoppingcartservice.service;
 
+import com.example.shoppingcartservice.ShoppingCartServiceApplication;
 import com.example.shoppingcartservice.client.ReservationServiceClient;
 import com.example.shoppingcartservice.dto.*;
 import com.example.shoppingcartservice.model.Cart;
@@ -8,6 +9,8 @@ import com.example.shoppingcartservice.model.Status;
 import com.example.shoppingcartservice.repository.CartRepository;
 import com.example.shoppingcartservice.repository.CartItemRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +30,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Autowired
     ReservationServiceClient reservationServiceClient;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShoppingCartServiceApplication.class);
+
     public CreateCartDTO createCart() {
 
         // New Cart created and saved
@@ -36,6 +41,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                             .status(Status.ACTIVE)
                             .build();
         cartRepository.save(cart);
+
+        LOGGER.info("CART CREATED");
 
         // Service Response
         CreateCartDTO createCartDTO = new CreateCartDTO();
@@ -52,8 +59,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         CreateReservationDTO createReservationDTO = reservationServiceClient.createReservation(itemId, quantity);
         CartResponseDTO cartResponseDTO = new CartResponseDTO();
 
-        if ( createReservationDTO.getResponse().getStatusCode() == HttpStatus.CREATED ) {
-
+        if ( createReservationDTO != null ) {
+            LOGGER.info("ITEM RESERVED");
             CartItem cartItem = CartItem.builder()
                     .cartItemId(UUID.randomUUID().toString())
                     .cartId(cartId)
@@ -69,18 +76,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             cartRepository.save(cart);
             cartItemRepository.save(cartItem);
 
+            LOGGER.info("ITEM ADDED");
+
             cartResponseDTO.setResponse(new ResponseEntity<>("ITEM ADDED", HttpStatus.OK));
 
-        } else if (createReservationDTO.getResponse().getStatusCode() == HttpStatus.NOT_FOUND ) {
-
-            cartResponseDTO.setResponse(new ResponseEntity<>("ITEM NOT FOUND", HttpStatus.NOT_FOUND));
-
-        } else if ( createReservationDTO.getResponse().getStatusCode() == HttpStatus.EXPECTATION_FAILED ) {
-
-            cartResponseDTO.setResponse(new ResponseEntity<>("ITEM QUANTITY NOT AVAILABLE", HttpStatus.EXPECTATION_FAILED));
-
         } else {
-
+            LOGGER.info("BAD REQUEST");
             cartResponseDTO.setResponse(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
 
         }

@@ -1,6 +1,7 @@
 package com.example.shoppingcartservice.controller;
 
 
+import com.example.shoppingcartservice.ShoppingCartServiceApplication;
 import com.example.shoppingcartservice.dto.CartResponseDTO;
 import com.example.shoppingcartservice.dto.CreateCartDTO;
 import com.example.shoppingcartservice.dto.RequestCartDTO;
@@ -20,7 +21,7 @@ public class ShoppingCartController {
     @Autowired
     ShoppingCartService shoppingCartService;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShoppingCartController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShoppingCartServiceApplication.class);
 
     @PostMapping("/cart")
     public CreateCartDTO createCart() {
@@ -35,8 +36,12 @@ public class ShoppingCartController {
     public CartResponseDTO addCartItem(@RequestParam String cartId, @RequestParam String itemId, @RequestParam int quantity ) {
 
         CartResponseDTO cartResponseDTO = shoppingCartService.addCartItem(cartId,itemId,quantity);
-        if (cartResponseDTO.getResponse().getStatusCode() == HttpStatus.OK)
-        LOGGER.info("Item Added");
+        if (cartResponseDTO.getResponse().getStatusCode() == HttpStatus.OK) {
+            LOGGER.info("Item Added");
+        } else {
+            LOGGER.info("Item NOT Added"+cartResponseDTO.getResponse().getBody());
+        }
+        LOGGER.info("Exiting Add Cart Item Service.");
         return cartResponseDTO;
 
     }

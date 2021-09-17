@@ -36,11 +36,11 @@ public class ReservationServiceImpl implements ReservationService {
 
         if ( item == null ) {
             LOGGER.info("Reservation not Created because Item was not found!");
-            createReservationDTO.setResponse(new ResponseEntity<>("ITEM NOT FOUND", HttpStatus.NOT_FOUND));
+//            createReservationDTO.setResponse(new ResponseEntity<>("ITEM NOT FOUND", HttpStatus.NOT_FOUND));
 
         } else if ( quantity > item.getQuantityAvailable() ) {
             LOGGER.info("Reservation not Created because available Item quantity was less then demand!");
-            createReservationDTO.setResponse(new ResponseEntity<>("SHORTAGE OF QUANTITY", HttpStatus.EXPECTATION_FAILED));
+//            createReservationDTO.setResponse(new ResponseEntity<>("SHORTAGE OF QUANTITY", HttpStatus.EXPECTATION_FAILED));
 
         } else {
 
@@ -62,7 +62,7 @@ public class ReservationServiceImpl implements ReservationService {
 
             createReservationDTO.setReservationID(reservation.getReservationID());
             createReservationDTO.setCostPerItem(item.getCost());
-            createReservationDTO.setResponse(new ResponseEntity<>("RESERVATION CREATED", HttpStatus.CREATED));
+//            createReservationDTO.setResponse(new ResponseEntity<>("RESERVATION CREATED", HttpStatus.CREATED));
 
             LOGGER.info("Reservation created successfully!");
         }
@@ -160,13 +160,6 @@ public class ReservationServiceImpl implements ReservationService {
         if ( reservation == null || reservation.getStatus() == Status.INACTIVE ) {
             LOGGER.info("Reservation not found.");
             return null;
-            reservationDTO.setResponse(new ResponseEntity<>("Reservation NOT FOUND", HttpStatus.NOT_FOUND));
-
-        } else if ( reservation.getStatus() == Status.INACTIVE ) {
-            LOGGER.info("Reservation has been deleted.");
-            reservationDTO.setResponse(new ResponseEntity<>("Reservation DELETED", HttpStatus.GONE));
-            return reservationDTO;
-
         }
 
         reservationDTO = ReservationDTO.builder()
