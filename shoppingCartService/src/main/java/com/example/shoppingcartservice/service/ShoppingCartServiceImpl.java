@@ -24,21 +24,6 @@ import java.util.UUID;
  * ShoppingCartService Class
  * @Author : Shubh Bansal
  *
- * Attributes:
- * - LOGGER
- * @Autowired
- *      - cartRepository : CartRepository
- *      - cartItemRepository : CartItemRepository
- *      - reservationServiceClient : ReservationServiceClient
- *
- * Methods:
- * - createCart : CreateCartDTO
- * - addCartItem : CartDTO
- * - updateCartItem : CartDTO
- * - deleteCartItem : CartDTO
- * - deleteCart : ResponseEntity
- * - getCart : CartDTO
- *
  * */
 @Service
 public class ShoppingCartServiceImpl implements ShoppingCartService {
@@ -54,14 +39,10 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     public CreateCartDTO createCart() {
         /*
-        * Method creates a new cart with a unique cartID and saves it to the database.
-        *
-        * @params - None
-        *
-        * @return - CreateCartDTO
-        *
-        * */
-
+         * Creates a new blank cart.
+         * Params:  None
+         * Returns: A DTO containing the ID of newly created cart.
+         * */
 
         Cart cart = Cart.builder()
                             .cartId(UUID.randomUUID().toString())
@@ -83,15 +64,11 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     public CartDTO addCartItem(String cartId, String itemId, int quantity) {
         /*
-         * Method adds a new item with requested quantity to the given cart.
-         *
-         * @params
-         * - cartID : String
-         * - itemId : String
-         * - quantity : int
-         *
-         * @return - CartDTO
-         *
+         * Adds a new unique item to cart with given quantity. Calls reservation microservice to reserve the given quantity of item. If the request is fulfilled successfully a CartDTO is returned containing information of updated cart.
+         * Params:  cartID - ID of cart in which item needs to be added
+         *          itemID - ID of item which needs to be added
+         *          quantity - desired quantity of item which needs to be added
+         * Returns: A DTO containing the details of cart after updation.
          * */
 
         Cart cart = cartRepository.findByCartId(cartId);
@@ -136,7 +113,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         // Reservation Unsuccessful
         else {
 
-            LOGGER.info("BAD REQUEST");
+            LOGGER.error("BAD REQUEST");
             cartDTO = null;
 
         }
@@ -147,15 +124,11 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     public CartDTO updateCartItem(String cartId, String itemId, int newQuantity) {
         /*
-         * Method adds updates an already existing cart item with new requested quantity.
-         *
-         * @params
-         * - cartID : String
-         * - itemId : String
-         * - newQuantity : int
-         *
-         * @return - CartDTO
-         *
+         * Updates the quantity of an already existing item in a cart with given new quantity. Calls reservation microservice to update the given quantity of item. If the request is fulfilled successfully a CartDTO is returned containing information of updated cart.
+         * Params:  cartID - ID of cart in which item needs to be updated
+         *          itemID - ID of item which needs to be updated
+         *          quantity - new desired quantity of item
+         * Returns: A DTO containing the details of cart after updation.
          * */
 
         Cart cart = cartRepository.findByCartId(cartId);
@@ -189,7 +162,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         else {
 
             cartDTO = null;
-            LOGGER.info("ITEM NOT UPDATED");
+            LOGGER.error("ITEM NOT UPDATED");
 
         }
 
@@ -199,14 +172,10 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     public CartDTO deleteCartItem(String cartId, String itemId) {
         /*
-         * Method deletes an already existing cart item.
-         *
-         * @params
-         * - cartID : String
-         * - itemId : String
-         *
-         * @return - CartDTO
-         *
+         * Deletes an already existing item from the respective cart. Calls reservation microservice to update the changes. If the request is fulfilled successfully a CartDTO is returned containing information of updated cart.
+         * Params:  cartID - ID of cart from which item needs to be deleted
+         *          itemID - ID of item which needs to be deleted
+         * Returns: A DTO containing the details of cart after updation.
          * */
 
         Cart cart = cartRepository.findByCartId(cartId);
@@ -244,12 +213,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     public ResponseEntity deleteCart(String cartId) {
         /*
-         * Method deletes the cart completely.
-         *
-         * @params - cartID : String
-         *
-         * @return - ResponseEntity
-         *
+         * Delete an already existing cart. A response is returned about successful completion of this process.
+         * Params:  cartID - ID of cart which needs to be deleted
+         * Returns: A Response Entity
          * */
 
         Cart cart = cartRepository.findByCartId(cartId);
@@ -276,12 +242,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     public CartDTO getCart(String cartId) {
         /*
-         * Method fetches the cart with given cartID and returns a DTO with all vital information including a list of ACTIVE items in the cart.
-         *
-         * @params - cartID : String
-         *
-         * @return - CartDTO
-         *
+         * Fetches a cart and items in it and returns all this information in an organised manner.
+         * Params:  cartID - ID of cart from which item needs to be fetched.
+         * Returns: A CartDTO containing the details of cart.
          * */
 
         CartDTO cartDTO = new CartDTO();

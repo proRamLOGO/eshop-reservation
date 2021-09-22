@@ -12,12 +12,6 @@ import com.example.shoppingcartservice.dto.ReservationDTO;
  * ReservationServiceClient Feign Client Interface
  * @Author : Shubh Bansal
  *
- * Methods:
- * - createReservation : CreateReservationDTO
- * - updateReservation : ResponseEntity
- * - deleteReservation : ResponseEntity
- * - getReservation : ReservationDTO
- *
  * */
 
 @FeignClient(name = "reservation", url  = "http://localhost:8080/reservation")

@@ -9,10 +9,6 @@ import lombok.NoArgsConstructor;
  * CreateReservationDTO Class
  * @Author : Shubh Bansal
  *
- * Attributes:
- * - reservationId : String
- * - costPerItem : float
- *
  * */
 @Data
 @NoArgsConstructor

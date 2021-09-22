@@ -14,13 +14,6 @@ import java.util.Date;
 * Cart Class
 * @Author : Shubh Bansal
 *
-* Attributes:
-* - cartId : String (Primary Key)
-* - cost : float
-* - status : enum(ACTIVE / INACTIVE)
-* - createdOn : Date
-* - updatedOn : Date
-*
 * */
 
 @Entity

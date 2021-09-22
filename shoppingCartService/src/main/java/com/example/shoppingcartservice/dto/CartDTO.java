@@ -11,11 +11,6 @@ import java.util.List;
  * CartDTO Class
  * @Author : Shubh Bansal
  *
- * Attributes:
- * - cartItems : List<CartItemDTO>
- * - cost : float
- * - createdOn : Date
- *
  * */
 @Data
 @NoArgsConstructor

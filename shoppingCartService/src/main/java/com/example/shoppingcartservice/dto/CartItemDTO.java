@@ -9,12 +9,6 @@ import lombok.Data;
  * CartItemDTO Class
  * @Author : Shubh Bansal
  *
- * Attributes:
- * - itemId : String
- * - reservationId : String
- * - quantity : int
- * - cost : float
- *
  * */
 @Data
 @Builder

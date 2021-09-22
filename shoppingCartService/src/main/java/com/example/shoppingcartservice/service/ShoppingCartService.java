@@ -20,16 +20,58 @@ import org.springframework.http.ResponseEntity;
  * */
 public interface ShoppingCartService {
 
-    public CreateCartDTO createCart();
 
-    public CartDTO addCartItem(String cartId, String itemId, int quantity);
+    /*
+     * Creates a new blank cart.
+     * Params:  None
+     * Returns: A DTO containing the ID of newly created cart.
+     * */
+    CreateCartDTO createCart();
 
-    public CartDTO updateCartItem(String cartId, String itemId, int quantity);
 
-    public CartDTO deleteCartItem(String cartId, String itemId);
+    /*
+     * Adds a new unique item to cart with given quantity. Calls reservation microservice to reserve the given quantity of item. If the request is fulfilled successfully a CartDTO is returned containing information of updated cart.
+     * Params:  cartID - ID of cart in which item needs to be added
+     *          itemID - ID of item which needs to be added
+     *          quantity - desired quantity of item which needs to be added
+     * Returns: A DTO containing the details of cart after updation.
+     * */
+    CartDTO addCartItem(String cartId, String itemId, int quantity);
 
-    public ResponseEntity deleteCart(String cartId);
 
-    public CartDTO getCart(String cartId);
+    /*
+     * Updates the quantity of an already existing item in a cart with given new quantity. Calls reservation microservice to update the given quantity of item. If the request is fulfilled successfully a CartDTO is returned containing information of updated cart.
+     * Params:  cartID - ID of cart in which item needs to be updated
+     *          itemID - ID of item which needs to be updated
+     *          quantity - new desired quantity of item
+     * Returns: A DTO containing the details of cart after updation.
+     * */
+    CartDTO updateCartItem(String cartId, String itemId, int quantity);
+
+
+
+    /*
+     * Deletes an already existing item from the respective cart. Calls reservation microservice to update the changes. If the request is fulfilled successfully a CartDTO is returned containing information of updated cart.
+     * Params:  cartID - ID of cart from which item needs to be deleted
+     *          itemID - ID of item which needs to be deleted
+     * Returns: A DTO containing the details of cart after updation.
+     * */
+    CartDTO deleteCartItem(String cartId, String itemId);
+
+
+    /*
+     * Delete an already existing cart. A response is returned about successful completion of this process.
+     * Params:  cartID - ID of cart which needs to be deleted
+     * Returns: A Response Entity
+     * */
+    ResponseEntity deleteCart(String cartId);
+
+
+    /*
+     * Fetches a cart and items in it and returns all this information in an organised manner.
+     * Params:  cartID - ID of cart from which item needs to be fetched.
+     * Returns: A CartDTO containing the details of cart.
+     * */
+    CartDTO getCart(String cartId);
 
 }

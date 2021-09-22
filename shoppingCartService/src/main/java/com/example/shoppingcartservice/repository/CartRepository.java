@@ -9,13 +9,15 @@ import org.springframework.stereotype.Repository;
  * CartRepository Repository
  * @Author : Shubh Bansal
  *
- * Methods:
- * - findByCartId : Cart
- *
  * */
 @Repository
 public interface CartRepository extends JpaRepository<Cart, String> {
 
+    /*
+     * Finds and returns a unique Cart from 'carts' table with given cartId.
+     * Params:  cartId - cart requested
+     * Returns: Cart Object for corresponding cart.
+     * */
     Cart findByCartId(String cartId);
 
 }

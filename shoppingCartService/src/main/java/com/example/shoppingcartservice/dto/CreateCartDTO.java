@@ -7,9 +7,6 @@ import lombok.NoArgsConstructor;
  * CreateCartDTO Class
  * @Author : Shubh Bansal
  *
- * Attributes:
- * - cartId : String
- *
  * */
 @Data
 @NoArgsConstructor

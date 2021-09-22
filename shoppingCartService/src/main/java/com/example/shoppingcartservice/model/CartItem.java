@@ -11,15 +11,6 @@ import javax.persistence.*;
  * CartItem Class
  * @Author : Shubh Bansal
  *
- * Attributes:
- * - cartItemId : String (Primary Key)
- * - cartId : String
- * - reservationId : String
- * - itemId : String
- * - quantity : int
- * - costPerItem : float
- * - status : enum(ACTIVE / INACTIVE)
- *
  * */
 @Entity
 @Data
