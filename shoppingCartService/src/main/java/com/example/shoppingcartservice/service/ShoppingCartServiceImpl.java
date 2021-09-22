@@ -20,6 +20,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/*
+ * ShoppingCartService Class
+ * @Author : Shubh Bansal
+ *
+ * Attributes:
+ * - LOGGER
+ * @Autowired
+ *      - cartRepository : CartRepository
+ *      - cartItemRepository : CartItemRepository
+ *      - reservationServiceClient : ReservationServiceClient
+ *
+ * Methods:
+ * - createCart : CreateCartDTO
+ * - addCartItem : CartDTO
+ * - updateCartItem : CartDTO
+ * - deleteCartItem : CartDTO
+ * - deleteCart : ResponseEntity
+ * - getCart : CartDTO
+ *
+ * */
 @Service
 public class ShoppingCartServiceImpl implements ShoppingCartService {
 
@@ -33,34 +53,63 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ShoppingCartServiceApplication.class);
 
     public CreateCartDTO createCart() {
+        /*
+        * Method creates a new cart with a unique cartID and saves it to the database.
+        *
+        * @params - None
+        *
+        * @return - CreateCartDTO
+        *
+        * */
 
-        // New Cart created and saved
+
         Cart cart = Cart.builder()
                             .cartId(UUID.randomUUID().toString())
                             .cost(0)
                             .status(Status.ACTIVE)
                             .build();
+
+        // Database Update
         cartRepository.save(cart);
 
-        LOGGER.info("CART CREATED");
-
-        // Service Response
         CreateCartDTO createCartDTO = new CreateCartDTO();
         createCartDTO.setCartId(cart.getCartId());
-        createCartDTO.setResponse(new ResponseEntity<>("CART CREATED", HttpStatus.CREATED));
+
+        LOGGER.info("CART CREATED");
 
         return createCartDTO;
 
     }
 
-    public CartResponseDTO addCartItem(String cartId, String itemId, int quantity) {
+    public CartDTO addCartItem(String cartId, String itemId, int quantity) {
+        /*
+         * Method adds a new item with requested quantity to the given cart.
+         *
+         * @params
+         * - cartID : String
+         * - itemId : String
+         * - quantity : int
+         *
+         * @return - CartDTO
+         *
+         * */
 
         Cart cart = cartRepository.findByCartId(cartId);
-        CreateReservationDTO createReservationDTO = reservationServiceClient.createReservation(itemId, quantity);
-        CartResponseDTO cartResponseDTO = new CartResponseDTO();
+        CartDTO cartDTO;
 
+        // False cartID provided
+        if ( cart==null ) {
+            cartDTO = null;
+            return cartDTO;
+        }
+
+        CreateReservationDTO createReservationDTO = reservationServiceClient.createReservation(itemId, quantity);
+
+        // Reservation Successful
         if ( createReservationDTO != null ) {
+
             LOGGER.info("ITEM RESERVED");
+
             CartItem cartItem = CartItem.builder()
                     .cartItemId(UUID.randomUUID().toString())
                     .cartId(cartId)
@@ -68,39 +117,55 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                     .reservationId(createReservationDTO.getReservationId())
                     .quantity(quantity)
                     .costPerItem(createReservationDTO.getCostPerItem())
+                    .status(Status.ACTIVE)
                     .build();
 
             float newCost = cartItem.getCostPerItem() * quantity;
             cart.setCost(cart.getCost()+newCost);
 
+            // Database Update
             cartRepository.save(cart);
             cartItemRepository.save(cartItem);
 
             LOGGER.info("ITEM ADDED");
 
-            cartResponseDTO.setResponse(new ResponseEntity<>("ITEM ADDED", HttpStatus.OK));
-
-        } else {
-            LOGGER.info("BAD REQUEST");
-            cartResponseDTO.setResponse(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+            cartDTO = getCart(cartId);
 
         }
 
-        return cartResponseDTO;
+        // Reservation Unsuccessful
+        else {
+
+            LOGGER.info("BAD REQUEST");
+            cartDTO = null;
+
+        }
+
+        return cartDTO;
 
     }
 
-    public CartResponseDTO updateCartItem(String cartId, String itemId, int newQuantity) {
-
-        // check for if quantity = 0 then call deleteItem
-        //---------------------------------------
+    public CartDTO updateCartItem(String cartId, String itemId, int newQuantity) {
+        /*
+         * Method adds updates an already existing cart item with new requested quantity.
+         *
+         * @params
+         * - cartID : String
+         * - itemId : String
+         * - newQuantity : int
+         *
+         * @return - CartDTO
+         *
+         * */
 
         Cart cart = cartRepository.findByCartId(cartId);
-        CartItem cartItem = cartItemRepository.findByCartIdAndItemId(cartId, itemId);
-        ReservationResponseDTO reservationResponseDTO = reservationServiceClient.updateReservation(cartItem.getReservationId(),newQuantity);
-        CartResponseDTO cartResponseDTO = new CartResponseDTO();
 
-        if (reservationResponseDTO.getResponse().getStatusCode() == HttpStatus.OK) {
+        CartItem cartItem = cartItemRepository.findByCartIdAndItemId(cartId, itemId);
+        ResponseEntity reservationResponseDTO = reservationServiceClient.updateReservation(cartItem.getReservationId(),newQuantity);
+        CartDTO cartDTO;
+
+        // Reservation Update Successful
+        if (reservationResponseDTO != null) {
 
             float originalCost = cartItem.getCostPerItem() * cartItem.getQuantity();
             float newCost = cartItem.getCostPerItem() * newQuantity;
@@ -110,85 +175,132 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             cartItem.setQuantity(newQuantity);
             cart.setCost(newCartCost);
 
-            cartResponseDTO.setResponse(new ResponseEntity<>("ITEM ADDED", HttpStatus.OK));
+            // Database Update
+            cartRepository.save(cart);
+            cartItemRepository.save(cartItem);
 
-        } else if ( reservationResponseDTO.getResponse().getStatusCode() == HttpStatus.NOT_FOUND ) {
+            cartDTO = getCart(cartId);
 
-            cartResponseDTO.setResponse(new ResponseEntity<>("ITEM NOT FOUND", HttpStatus.NOT_FOUND));
-
-        } else if ( reservationResponseDTO.getResponse().getStatusCode() == HttpStatus.EXPECTATION_FAILED ) {
-
-            cartResponseDTO.setResponse(new ResponseEntity<>("ITEM QUANTITY NOT AVAILABLE", HttpStatus.EXPECTATION_FAILED));
-
-        } else {
-
-            cartResponseDTO.setResponse(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+            LOGGER.info("ITEM UPDATED");
 
         }
 
-        return cartResponseDTO;
+        // Reservation Update Unsuccessful
+        else {
+
+            cartDTO = null;
+            LOGGER.info("ITEM NOT UPDATED");
+
+        }
+
+        return cartDTO;
 
     }
 
-    public CartResponseDTO deleteCartItem(String cartId, String itemId) {
+    public CartDTO deleteCartItem(String cartId, String itemId) {
+        /*
+         * Method deletes an already existing cart item.
+         *
+         * @params
+         * - cartID : String
+         * - itemId : String
+         *
+         * @return - CartDTO
+         *
+         * */
 
         Cart cart = cartRepository.findByCartId(cartId);
         CartItem cartItem = cartItemRepository.findByCartIdAndItemId(cartId, itemId);
-        ReservationResponseDTO reservationResponseDTO = reservationServiceClient.deleteReservation(cartItem.getReservationId());
-        CartResponseDTO cartResponseDTO = new CartResponseDTO();
+        ResponseEntity reservationResponseDTO = reservationServiceClient.deleteReservation(cartItem.getReservationId());
+        CartDTO cartDTO;
 
-        if (reservationResponseDTO.getResponse().getStatusCode() == HttpStatus.OK) {
+        // Reservation Delete Successful
+        if (reservationResponseDTO != null) {
+
             float totalItemCost = cartItem.getCostPerItem() * cartItem.getQuantity();
             float newCartCost = cart.getCost() - totalItemCost;
 
             cartItem.setStatus(Status.INACTIVE);
             cart.setCost(newCartCost);
 
-            cartResponseDTO.setResponse(new ResponseEntity<>("ITEM DELETED", HttpStatus.OK));
+            // Database Update
+            cartRepository.save(cart);
+            cartItemRepository.save(cartItem);
 
-        } else if ( reservationResponseDTO.getResponse().getStatusCode() == HttpStatus.NOT_FOUND ) {
-
-            cartResponseDTO.setResponse(new ResponseEntity<>("ITEM RESERVATION NOT FOUND", HttpStatus.NOT_FOUND));
-            // since its present here and not found in reservation, should we update it here ?
-
-        } else {
-
-            cartResponseDTO.setResponse(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+            cartDTO = getCart(cartId);
 
         }
 
-        return cartResponseDTO;
+        // Reservation Delete Unsuccessful
+        else {
+
+            cartDTO = null;
+
+        }
+
+        return cartDTO;
 
     }
 
-    public CartResponseDTO deleteCart(String cartId) {
+    public ResponseEntity deleteCart(String cartId) {
+        /*
+         * Method deletes the cart completely.
+         *
+         * @params - cartID : String
+         *
+         * @return - ResponseEntity
+         *
+         * */
 
         Cart cart = cartRepository.findByCartId(cartId);
-        CartResponseDTO cartResponseDTO = new CartResponseDTO();
+        ResponseEntity response;
 
-        cart.setStatus(Status.INACTIVE);
+        // False CartID provided or cart already deleted.
+        if ( cart==null || cart.getStatus()==Status.INACTIVE ) {
+            response = new ResponseEntity("CART NOT FOUND", HttpStatus.NOT_FOUND);
+        }
 
-        cartResponseDTO.setResponse(new ResponseEntity<>(HttpStatus.OK));
+        // Cart deleted successfully
+        else {
+            cart.setStatus(Status.INACTIVE);
 
-        return cartResponseDTO;
+            // Database Update
+            cartRepository.save(cart);
+
+            response = new ResponseEntity("CART DELETED", HttpStatus.OK);
+
+        }
+        return response;
 
     }
 
-    public RequestCartDTO getCart(String cartId) {
+    public CartDTO getCart(String cartId) {
+        /*
+         * Method fetches the cart with given cartID and returns a DTO with all vital information including a list of ACTIVE items in the cart.
+         *
+         * @params - cartID : String
+         *
+         * @return - CartDTO
+         *
+         * */
 
-        RequestCartDTO requestCartDTO = new RequestCartDTO();
+        CartDTO cartDTO = new CartDTO();
         Cart cart = cartRepository.findByCartId(cartId);
 
+        // Cart Deleted
         if ( cart.getStatus() == Status.INACTIVE ) {
-            requestCartDTO.setResponse(new ResponseEntity<>("CART INACTIVE", HttpStatus.CONFLICT));
+            cartDTO = null;
+        }
 
-        } else {
+        // Cart Found
+        else {
 
             List<CartItem> cartItemList = cartItemRepository.findByCartId(cartId);
             List<CartItemDTO> cartItemDTOList = new ArrayList<>();
 
             for ( CartItem cartItem : cartItemList ) {
 
+                // Include cartItem iff it is NOT DELETED i.e. it's status is set to ACTIVE
                 if ( cartItem.getStatus() == Status.ACTIVE ) {
 
                     float cartItemCost = cartItem.getQuantity() * cartItem.getCostPerItem();
@@ -197,19 +309,19 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                             .itemId(cartItem.getItemId())
                             .quantity(cartItem.getQuantity())
                             .cost(cartItemCost)
+                            .reservationId(cartItem.getReservationId())
                             .build();
                     cartItemDTOList.add(cartItemDTO);
                 }
 
             }
 
-            requestCartDTO.setCartItems(cartItemDTOList);
-            requestCartDTO.setCost(cart.getCost());
-            requestCartDTO.setResponse(new ResponseEntity<>("CART FOUND", HttpStatus.OK));
+            cartDTO.setCartItems(cartItemDTOList);
+            cartDTO.setCost(cart.getCost());
 
         }
 
-        return requestCartDTO;
+        return cartDTO;
 
     }
 

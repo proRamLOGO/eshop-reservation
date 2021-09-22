@@ -2,13 +2,18 @@ package com.example.shoppingcartservice.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
 
-import javax.persistence.Id;
-
+/*
+ * CreateCartDTO Class
+ * @Author : Shubh Bansal
+ *
+ * Attributes:
+ * - cartId : String
+ *
+ * */
 @Data
 @NoArgsConstructor
-public class CreateCartDTO extends CartResponseDTO {
+public class CreateCartDTO {
 
     private String cartId;
 

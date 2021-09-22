@@ -11,7 +11,22 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 
-
+/*
+ * Reservation Class
+ * @Author : Shubh Bansal
+ *
+ * Table Name: reservations
+ *
+ * Attributes:
+ * - reservationId : String (Primary Key)
+ * - itemId : String
+ * - quantity : int
+ * - cost : float
+ * - status : enum(ACTIVE / INACTIVE)
+ * - createdOn : Date
+ * - updatedOn : Date
+ *
+ * */
 @Data
 @Builder
 @Document(collection = "reservations")
@@ -20,9 +35,9 @@ import java.util.Date;
 public class Reservation {
 
     @Id
-    private String reservationID;
+    private String reservationId;
 
-    private String itemID;
+    private String itemId;
 
     private int quantity;
 

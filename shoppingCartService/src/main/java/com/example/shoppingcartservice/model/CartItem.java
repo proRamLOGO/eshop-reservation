@@ -8,16 +8,19 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 /*
- * Reservation Class
+ * CartItem Class
  * @Author : Shubh Bansal
- * Date : Sept 4, 2021
  *
  * Attributes:
- * - reservationID : Primary Key
- * - cartID : Cart to which this reservation belongs to.
+ * - cartItemId : String (Primary Key)
+ * - cartId : String
+ * - reservationId : String
+ * - itemId : String
+ * - quantity : int
+ * - costPerItem : float
+ * - status : enum(ACTIVE / INACTIVE)
  *
  * */
-
 @Entity
 @Data
 @Builder

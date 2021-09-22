@@ -7,9 +7,19 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.util.Date;
 import java.util.List;
 
+/*
+ * CartDTO Class
+ * @Author : Shubh Bansal
+ *
+ * Attributes:
+ * - cartItems : List<CartItemDTO>
+ * - cost : float
+ * - createdOn : Date
+ *
+ * */
 @Data
 @NoArgsConstructor
-public class RequestCartDTO extends CartResponseDTO {
+public class CartDTO  {
 
     private List<CartItemDTO> cartItems;
     private float cost;

@@ -8,20 +8,18 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.Date;
 
 /*
 * Cart Class
 * @Author : Shubh Bansal
-* Date : Sept 4, 2021
 *
 * Attributes:
-* - cartID : Primary Key
-* - amount : Cost
+* - cartId : String (Primary Key)
+* - cost : float
 * - status : enum(ACTIVE / INACTIVE)
-* - createdOn : Timestamp for cart creation
-* - updatedOn : Timestamp for latest cart updation
+* - createdOn : Date
+* - updatedOn : Date
 *
 * */
 

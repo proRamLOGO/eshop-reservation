@@ -2,16 +2,35 @@ package com.example.shoppingcartservice.controller;
 
 
 import com.example.shoppingcartservice.ShoppingCartServiceApplication;
-import com.example.shoppingcartservice.dto.CartResponseDTO;
 import com.example.shoppingcartservice.dto.CreateCartDTO;
-import com.example.shoppingcartservice.dto.RequestCartDTO;
+import com.example.shoppingcartservice.dto.CartDTO;
 import com.example.shoppingcartservice.service.ShoppingCartService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+
+/*
+ * ShoppingCartController Class
+ * @Author : Shubh Bansal
+ *
+ * Attributes:
+ * - LOGGER
+ * @Autowired
+ *      - shoppingCartService : ShoppingCartService
+ *
+ * Methods:
+ * - POST createCart : CreateCartDTO
+ * - POST addCartItem : CartDTO
+ * - PUT updateCartItem : CartDTO
+ * - DELETE deleteCartItem : CartDTO
+ * - DELETE deleteCart : ResponseEntity
+ * - GET getCart : CartDTO
+ *
+ * */
 
 @RefreshScope
 @RestController
@@ -27,56 +46,53 @@ public class ShoppingCartController {
     public CreateCartDTO createCart() {
 
         CreateCartDTO createCartDTO = shoppingCartService.createCart();
-        LOGGER.info("New Cart "+createCartDTO.getCartId()+" Created");
+        LOGGER.info("Exiting Create Cart Service.");
         return createCartDTO;
 
     }
 
     @PostMapping("/item")
-    public CartResponseDTO addCartItem(@RequestParam String cartId, @RequestParam String itemId, @RequestParam int quantity ) {
+    public CartDTO addCartItem(@RequestParam String cartId, @RequestParam String itemId, @RequestParam int quantity ) {
 
-        CartResponseDTO cartResponseDTO = shoppingCartService.addCartItem(cartId,itemId,quantity);
-        if (cartResponseDTO.getResponse().getStatusCode() == HttpStatus.OK) {
-            LOGGER.info("Item Added");
-        } else {
-            LOGGER.info("Item NOT Added"+cartResponseDTO.getResponse().getBody());
-        }
+        CartDTO cartDTO = shoppingCartService.addCartItem(cartId,itemId,quantity);
         LOGGER.info("Exiting Add Cart Item Service.");
-        return cartResponseDTO;
+        return cartDTO;
 
     }
 
     @PutMapping("/item")
-    public CartResponseDTO updateCartItem(@RequestParam String cartId, @RequestParam String itemId, @RequestParam int quantity ) {
+    public CartDTO updateCartItem(@RequestParam String cartId, @RequestParam String itemId, @RequestParam int quantity ) {
 
-        CartResponseDTO cartResponseDTO = shoppingCartService.updateCartItem(cartId,itemId,quantity);
-        LOGGER.info("Item Updated");
-        return cartResponseDTO;
+        CartDTO cartDTO = shoppingCartService.updateCartItem(cartId,itemId,quantity);
+        LOGGER.info("Exiting Update Item Service.");
+        return cartDTO;
 
     }
 
     @DeleteMapping("/item")
-    public CartResponseDTO deleteCartItem(@RequestParam String cartId, @RequestParam String itemId) {
+    public CartDTO deleteCartItem(@RequestParam String cartId, @RequestParam String itemId) {
 
-        CartResponseDTO cartResponseDTO = shoppingCartService.deleteCartItem(cartId,itemId);
-        LOGGER.info("Item Deleted");
-        return cartResponseDTO;
+        CartDTO cartDTO = shoppingCartService.deleteCartItem(cartId,itemId);
+        LOGGER.info("Exiting Delete Item Service.");
+        return cartDTO;
 
     }
 
     @DeleteMapping("/cart/{cartId}")
-    public CartResponseDTO deleteCart(@PathVariable String cartId) {
+    public ResponseEntity deleteCart(@PathVariable String cartId) {
 
-        CartResponseDTO cartResponseDTO = shoppingCartService.deleteCart(cartId);
-        LOGGER.info("Cart Deleted");
-        return cartResponseDTO;
+        ResponseEntity response = shoppingCartService.deleteCart(cartId);
+        LOGGER.info("Exiting Update Cart Service.");
+        return response;
 
     }
 
     @GetMapping("/cart/{cartId}")
-    public RequestCartDTO getCart(@PathVariable String cartId) {
-        RequestCartDTO requestCartDTO = shoppingCartService.getCart(cartId);
-        LOGGER.info("Cart Found and Fetched");
-        return requestCartDTO;
+    public CartDTO getCart(@PathVariable String cartId) {
+
+        CartDTO cartDTO = shoppingCartService.getCart(cartId);
+        LOGGER.info("Exiting Get Cart Service.");
+        return cartDTO;
+
     }
 }

@@ -5,6 +5,17 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.Data;
 
+/*
+ * CartItemDTO Class
+ * @Author : Shubh Bansal
+ *
+ * Attributes:
+ * - itemId : String
+ * - reservationId : String
+ * - quantity : int
+ * - cost : float
+ *
+ * */
 @Data
 @Builder
 @NoArgsConstructor
@@ -12,7 +23,11 @@ import lombok.Data;
 public class CartItemDTO {
 
     private String itemId;
+
+    private String reservationId;
+
     private int quantity;
+
     private float cost;
 
 }

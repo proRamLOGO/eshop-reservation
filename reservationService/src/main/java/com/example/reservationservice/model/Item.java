@@ -10,6 +10,20 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 
+/*
+ * Item Class
+ * @Author : Shubh Bansal
+ *
+ * Table name: items
+ *
+ * Attributes:
+ * - itemId : String (Primary Key)
+ * - quantityAvailable : int
+ * - cost : float
+ * - updatedOn : Date
+ * - status : enum(ACTIVE / INACTIVE)
+ *
+ * */
 @Data
 @Document(collection = "items")
 @Builder
@@ -18,7 +32,7 @@ import java.util.Date;
 public class Item {
 
     @Id
-    private String itemID;
+    private String itemId;
 
     private int quantityAvailable;
 

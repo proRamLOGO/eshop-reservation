@@ -3,7 +3,6 @@ package com.example.reservationservice.service;
 import com.example.reservationservice.ReservationServiceApplication;
 import com.example.reservationservice.dto.CreateReservationDTO;
 import com.example.reservationservice.dto.ReservationDTO;
-import com.example.reservationservice.dto.ReservationResponseDTO;
 import com.example.reservationservice.model.Item;
 import com.example.reservationservice.model.Reservation;
 import com.example.reservationservice.model.Status;
@@ -29,18 +28,24 @@ public class ReservationServiceImpl implements ReservationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReservationServiceApplication.class);
 
-    public CreateReservationDTO createReservation(String itemID, int quantity) {
+    public CreateReservationDTO createReservation(String itemId, int quantity) {
+        /*
+         * Creates a reservation with given quantity for the given item.
+         * Params:  itemID - ID of item for which reservation needs to be created
+         *          quantity - desired quantity which needs to be reserved
+         * Returns: A DTO containing the Reservation ID of created reservation and cost per item
+         * */
 
-        Item item = itemRepository.findByItemID(itemID);
+        Item item = itemRepository.findByItemId(itemId);
         CreateReservationDTO createReservationDTO = new CreateReservationDTO();
 
         if ( item == null ) {
-            LOGGER.info("Reservation not Created because Item was not found!");
-//            createReservationDTO.setResponse(new ResponseEntity<>("ITEM NOT FOUND", HttpStatus.NOT_FOUND));
+            LOGGER.error("Item not found!");
+            createReservationDTO = null;
 
         } else if ( quantity > item.getQuantityAvailable() ) {
-            LOGGER.info("Reservation not Created because available Item quantity was less then demand!");
-//            createReservationDTO.setResponse(new ResponseEntity<>("SHORTAGE OF QUANTITY", HttpStatus.EXPECTATION_FAILED));
+            LOGGER.error("Requested quantity not available!");
+            createReservationDTO = null;
 
         } else {
 
@@ -48,8 +53,8 @@ public class ReservationServiceImpl implements ReservationService {
             int newQuantityAvailable = item.getQuantityAvailable() - quantity;
 
             Reservation reservation = Reservation.builder()
-                    .reservationID(UUID.randomUUID().toString())
-                    .itemID(itemID)
+                    .reservationId(UUID.randomUUID().toString())
+                    .itemId(itemId)
                     .quantity(quantity)
                     .cost(reservationCost)
                     .status(Status.ACTIVE)
@@ -60,9 +65,8 @@ public class ReservationServiceImpl implements ReservationService {
             reservationRepository.save(reservation);
             itemRepository.save(item);
 
-            createReservationDTO.setReservationID(reservation.getReservationID());
+            createReservationDTO.setReservationId(reservation.getReservationId());
             createReservationDTO.setCostPerItem(item.getCost());
-//            createReservationDTO.setResponse(new ResponseEntity<>("RESERVATION CREATED", HttpStatus.CREATED));
 
             LOGGER.info("Reservation created successfully!");
         }
@@ -71,32 +75,38 @@ public class ReservationServiceImpl implements ReservationService {
 
     }
 
-    public ReservationResponseDTO updateReservation(String reservationID, int newQuantity) {
+    public ResponseEntity updateReservation(String reservationId, int newQuantity) {
+        /*
+         * Updates a reservation with given quantity for the given item.
+         * Params:  reservationId - ID of reservation which needs to be updated
+         *          newQuantity - desired quantity which needs to be reserved after updation
+         * Returns: Response on the successful completion of updation
+         * */
 
-        ReservationResponseDTO reservationResponseDTO = new ReservationResponseDTO();
-        Reservation reservation = reservationRepository.findByReservationID(reservationID);
+        Reservation reservation = reservationRepository.findByReservationId(reservationId);
+        ResponseEntity<String> response;
 
         if ( reservation == null ) {
-            LOGGER.info("Reservation not found.");
-            reservationResponseDTO.setResponse(new ResponseEntity<>("Reservation NOT FOUND", HttpStatus.NOT_FOUND));
-            return reservationResponseDTO;
+            LOGGER.error("Reservation not found.");
+            response = new ResponseEntity<>("Reservation NOT FOUND", HttpStatus.NOT_FOUND);
+            return response;
 
         } else if ( reservation.getStatus() == Status.INACTIVE ) {
-            LOGGER.info("Reservation has been deleted.");
-            reservationResponseDTO.setResponse(new ResponseEntity<>("Reservation DELETED", HttpStatus.GONE));
-            return reservationResponseDTO;
+            LOGGER.error("Reservation has been deleted.");
+            response = new ResponseEntity<>("Reservation DELETED", HttpStatus.GONE);
+            return response;
 
         }
 
-        String itemID = reservation.getItemID();
-        Item item = itemRepository.findByItemID(itemID);
+        String itemId = reservation.getItemId();
+        Item item = itemRepository.findByItemId(itemId);
 
         int currentReservedQuantity = reservation.getQuantity();
         int quantityChange = newQuantity - currentReservedQuantity;
 
-        if ( quantityChange > item.getQuantityAvailable() ) {
-            LOGGER.info("Reservation not Updated because available Item quantity was less then demand!");
-            reservationResponseDTO.setResponse(new ResponseEntity<>("SHORTAGE", HttpStatus.EXPECTATION_FAILED));
+        if (quantityChange > item.getQuantityAvailable()) {
+            LOGGER.error("Requested quantity not available!");
+            response = new ResponseEntity<>("SHORTAGE", HttpStatus.EXPECTATION_FAILED);
 
         } else {
 
@@ -111,33 +121,38 @@ public class ReservationServiceImpl implements ReservationService {
             reservationRepository.save(reservation);
             itemRepository.save(item);
 
-            LOGGER.info("Reservation updated successfully!");
-            reservationResponseDTO.setResponse(new ResponseEntity<>("UPDATED SUCCESSFULLY", HttpStatus.OK));
+            response = new ResponseEntity<>("UPDATED SUCCESSFULLY", HttpStatus.OK);
 
+            LOGGER.info("Reservation updated successfully!");
         }
 
-        return reservationResponseDTO;
+        return response;
 
     }
 
-    public ReservationResponseDTO deleteReservation(String reservationID) {
+    public ResponseEntity deleteReservation(String reservationId) {
+        /*
+         * Deletes a reservation.
+         * Params:  reservationId - ID of reservation which needs to be deleted
+         * Returns: Response on the successful completion of deletion
+         * */
 
-        ReservationResponseDTO reservationResponseDTO = new ReservationResponseDTO();
-        Reservation reservation = reservationRepository.findByReservationID(reservationID);
+        Reservation reservation = reservationRepository.findByReservationId(reservationId);
+        ResponseEntity<String> response;
 
         if ( reservation == null ) {
-            LOGGER.info("Reservation not found.");
-            reservationResponseDTO.setResponse(new ResponseEntity<>("Reservation NOT FOUND", HttpStatus.NOT_FOUND));
-            return reservationResponseDTO;
+            LOGGER.error("Reservation not found.");
+            response = new ResponseEntity<>("Reservation NOT FOUND", HttpStatus.NOT_FOUND);
+            return response;
 
         } else if ( reservation.getStatus() == Status.INACTIVE ) {
-            LOGGER.info("Reservation has been deleted already.");
-            reservationResponseDTO.setResponse(new ResponseEntity<>("Reservation DELETED ALREADY", HttpStatus.GONE));
-            return reservationResponseDTO;
+            LOGGER.error("Reservation has been deleted already.");
+            response = new ResponseEntity<>("Reservation DELETED ALREADY", HttpStatus.GONE);
+            return response;
 
         }
 
-        Item item = itemRepository.findByItemID(reservation.getItemID());
+        Item item = itemRepository.findByItemId(reservation.getItemId());
 
         reservation.setStatus(Status.INACTIVE);
         item.setQuantityAvailable(item.getQuantityAvailable() + reservation.getQuantity());
@@ -147,32 +162,38 @@ public class ReservationServiceImpl implements ReservationService {
 
         LOGGER.info("Reservation deleted successfully!");
 
-        reservationResponseDTO.setResponse(new ResponseEntity<>("DELETED", HttpStatus.OK));
+        response = new ResponseEntity<>("DELETED", HttpStatus.OK);
+        return response;
 
-        return reservationResponseDTO;
     }
 
-    public ReservationDTO getReservation(String reservationID) {
+    public ReservationDTO getReservation(String reservationId) {
+        /*
+         * Fetches requested reservation.
+         * Params:  reservationId - ID of reservation.
+         * Returns: DTO with vital information of reservation.
+         * */
 
-        Reservation reservation = reservationRepository.findByReservationID(reservationID);
-        ReservationDTO reservationDTO = new ReservationDTO();
+        Reservation reservation = reservationRepository.findByReservationId(reservationId);
+        ReservationDTO reservationDTO;
 
         if ( reservation == null || reservation.getStatus() == Status.INACTIVE ) {
-            LOGGER.info("Reservation not found.");
-            return null;
+
+            reservationDTO = null;
+            LOGGER.error("Reservation not found.");
+
+        } else {
+
+            reservationDTO = ReservationDTO.builder()
+                    .reservationId(reservation.getReservationId())
+                    .itemId(reservation.getItemId())
+                    .quantity(reservation.getQuantity())
+                    .cost(reservation.getCost())
+                    .build();
+
+            LOGGER.info("Reservation found and returned successfully!");
+
         }
-
-        reservationDTO = ReservationDTO.builder()
-                .reservationID(reservation.getReservationID())
-                .itemID(reservation.getItemID())
-                .quantity(reservation.getQuantity())
-                .cost(reservation.getCost())
-                .build();
-
-        reservationDTO.setResponse(new ResponseEntity<>("RESERVATION FOUND", HttpStatus.OK ));
-
-        LOGGER.info("Reservation found and returned successfully!");
-
         return reservationDTO;
 
     }

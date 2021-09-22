@@ -1,22 +1,22 @@
 package com.example.reservationservice.dto;
 
 
-import com.example.reservationservice.model.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
+
+import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ReservationDTO extends ReservationResponseDTO {
+public class ReservationDTO implements Serializable {
 
-    private String reservationID;
+    private String reservationId;
 
-    private String itemID;
+    private String itemId;
 
     private int quantity;
 
